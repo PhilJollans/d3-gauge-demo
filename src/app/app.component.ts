@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { RoundGaugeComponent } from './round-gauge/round-gauge.component';
 import { ArcGaugeComponent } from './arc-gauge/arc-gauge.component';
 import { FormsModule } from '@angular/forms';
+import { BlockGaugeComponent } from './block-gauge/block-gauge.component';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { FormsModule } from '@angular/forms';
     FormsModule,
     RoundGaugeComponent,
     ArcGaugeComponent,
+    BlockGaugeComponent,
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
