@@ -43,7 +43,6 @@ export class RoundGaugeComponent implements OnInit
       .append( 'g' )
       .attr( 'transform', 'translate(150, 150)' ); // Center the gauge
 
-    // V1
     // I had to add "as any" to arc.
     const arc = d3.arc()
       .innerRadius( 80 )
@@ -55,26 +54,6 @@ export class RoundGaugeComponent implements OnInit
       .attr( 'd', arc as any )
       .attr( 'fill', '#ddd' );
 
-    // V2
-    // const arc = d3.arc<d3.DefaultArcObject>()  // Specify the type explicitly
-    //   .innerRadius( 80 )
-    //   .outerRadius( 100 )
-    //   .startAngle( -Math.PI / 2 )  // Start at 12 o'clock
-    //   .endAngle( Math.PI / 2 );    // End at 6 o'clock
-
-    // // Define the data object to pass the required properties
-    // const arcData = {
-    //   innerRadius: 80,
-    //   outerRadius: 100,
-    //   startAngle: -Math.PI / 2,
-    //   endAngle: Math.PI / 2
-    // };
-
-    // svg.append( 'path' )
-    //   .datum( arcData )  // Pass the correct arc data
-    //   .attr( 'd', arc )  // Pass the arc generator
-    //   .attr( 'fill', '#ddd' );  // Background arc
-
     this.needle = this.svg.append( 'line' )
       .attr( 'x1', 0 )
       .attr( 'y1', 0 )
@@ -82,7 +61,7 @@ export class RoundGaugeComponent implements OnInit
       .attr( 'y2', -80 )
       .attr( 'stroke', 'red' )
       .attr( 'stroke-width', 5 )
-      .attr( 'transform', 'rotate(0)' );  // Starting position
+      .attr( 'transform', 'rotate(0)' );
 
     this.drawScale() ;
 

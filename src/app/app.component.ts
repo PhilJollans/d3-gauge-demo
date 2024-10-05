@@ -4,6 +4,7 @@ import { RoundGaugeComponent } from './round-gauge/round-gauge.component';
 import { ArcGaugeComponent } from './arc-gauge/arc-gauge.component';
 import { FormsModule } from '@angular/forms';
 import { BlockGaugeComponent } from './block-gauge/block-gauge.component';
+import { NeedleGaugeComponent } from './needle-gauge/needle-gauge.component';
 
 @Component({
   selector: 'app-root',
@@ -12,6 +13,7 @@ import { BlockGaugeComponent } from './block-gauge/block-gauge.component';
     RouterOutlet,
     FormsModule,
     RoundGaugeComponent,
+    NeedleGaugeComponent,
     ArcGaugeComponent,
     BlockGaugeComponent,
   ],

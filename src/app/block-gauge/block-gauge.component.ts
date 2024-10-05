@@ -26,9 +26,12 @@ export class BlockGaugeComponent implements OnInit
   private readonly blockSize: number = 2.5 * Math.PI / 180;
   private readonly gapSize: number = 1 * Math.PI / 180;
 
+  private readonly startingAngle : number = -120 * Math.PI / 180 ;
+  private readonly endingAngle : number = +120 * Math.PI / 180 ;
+
   private readonly mainTickInnerRadius = 100;
   private readonly mainTickOuterRadius = 110;
-  private readonly labelRadius = 120;
+  private readonly labelRadius = 125;
 
   private readonly innerArcRadius = 80;
   private readonly outerArcRadius = 100;
@@ -66,23 +69,15 @@ export class BlockGaugeComponent implements OnInit
     this.svg = d3.select( this.gaugeElement.nativeElement )
       .append( 'svg' )
       .attr( 'width', 300 )
-      .attr( 'height', 160 )
+      .attr( 'height', 300 )
       .append( 'g' )
       .attr( 'transform', 'translate(150, 150)' ); // Center the gauge
-
-    // V1
-    // I had to add "as any" to arc.
-    const arc = d3.arc()
-      .innerRadius( 80 )
-      .outerRadius( 100 )
-      .startAngle( -Math.PI / 2 )
-      .endAngle( Math.PI / 2 );
 
     const arc1 = d3.arc()
       .innerRadius( this.innerRingRadius )
       .outerRadius( this.innerRingRadius )
-      .startAngle( -Math.PI / 2 )
-      .endAngle( Math.PI / 2 );
+      .startAngle( this.startingAngle )
+      .endAngle( this.endingAngle );
 
     this.svg.append( 'path' )
       .attr( 'd', arc1 as any )
@@ -93,8 +88,8 @@ export class BlockGaugeComponent implements OnInit
     const arc2 = d3.arc()
       .innerRadius( this.outerRingRadius )
       .outerRadius( this.outerRingRadius )
-      .startAngle( -Math.PI / 2 )
-      .endAngle( Math.PI / 2 );
+      .startAngle( this.startingAngle )
+      .endAngle( this.endingAngle );
 
     this.svg.append( 'path' )
       .attr( 'd', arc2 as any )
@@ -103,15 +98,15 @@ export class BlockGaugeComponent implements OnInit
       .attr( 'stroke-width', 2 ); // Line thickness (you can adjust this value)
 
     // Append a new text element
-    this.textElement = this.svg.append('text')
-      .attr('class', 'value')
-      .attr('x', 0)  // Center horizontally
-      .attr('y', -20)  // Center vertically (adjusted for baseline)
-      .attr('text-anchor', 'middle')  // Align text horizontally
-      .attr('dominant-baseline', 'middle')  // Align text vertically
-      .attr('font-size', '36px')  // Font size (can adjust as needed)
-      .attr("font-family", "Verdana")
-      .attr('fill', '#000');
+    this.textElement = this.svg.append( 'text' )
+      .attr( 'class', 'value' )
+      .attr( 'x', 0 )
+      .attr( 'y', 0 )
+      .attr( 'text-anchor', 'middle' )
+      .attr( 'dominant-baseline', 'middle' )
+      .attr( 'font-size', '36px' )
+      .attr( "font-family", "Verdana" )
+      .attr( 'fill', '#000' );
 
     this.drawScale();
 
@@ -128,38 +123,37 @@ export class BlockGaugeComponent implements OnInit
     this.updateGauge( this.gaugeValue );
   }
 
+  // This is an updated version of the function in round-gauge and arc-gauge
+  // which now uses D3's binding capability.
   drawScale (): void
   {
     const scaleValues = [ 0, 25, 50, 75, 100 ];  // Define scale values
     const scaleGroup = this.svg.append( 'g' );
 
-    scaleValues.forEach( ( value ) =>
-    {
-      const angle = this.scaleToAngleRad( value );
-      const xOuter = Math.sin( angle ) * this.mainTickOuterRadius;
-      const yOuter = -Math.cos( angle ) * this.mainTickOuterRadius;
-      const xInner = Math.sin( angle ) * this.mainTickInnerRadius;
-      const yInner = -Math.cos( angle ) * this.mainTickInnerRadius;
-      const xLabel = Math.sin( angle ) * this.labelRadius;
-      const yLabel = -Math.cos( angle ) * this.labelRadius;
+    // Bind scaleValues as data
+    const ticks = scaleGroup.selectAll( 'line' )
+      .data( scaleValues )
+      .enter()
+      .append( 'line' )
+      .attr( 'x1', d => Math.sin( this.scaleToAngleRad( d ) ) * this.mainTickInnerRadius )
+      .attr( 'y1', d => -Math.cos( this.scaleToAngleRad( d ) ) * this.mainTickInnerRadius )
+      .attr( 'x2', d => Math.sin( this.scaleToAngleRad( d ) ) * this.mainTickOuterRadius )
+      .attr( 'y2', d => -Math.cos( this.scaleToAngleRad( d ) ) * this.mainTickOuterRadius )
+      .attr( 'stroke', 'black' )
+      .attr( 'stroke-width', 2 );
 
-      // Draw tick marks
-      scaleGroup.append( 'line' )
-        .attr( 'x1', xInner )
-        .attr( 'y1', yInner )
-        .attr( 'x2', xOuter )
-        .attr( 'y2', yOuter )
-        .attr( 'stroke', 'black' )
-        .attr( 'stroke-width', 2 );
-
-      // Draw labels
-      scaleGroup.append( 'text' )
-        .attr( 'x', xLabel )
-        .attr( 'y', yLabel )
-        .attr( 'dy', '0.35em' )  // Center the text vertically
-        .attr( 'text-anchor', 'middle' )
-        .text( value );
-    } );
+    // Bind scaleValues to labels
+    const labels = scaleGroup.selectAll( 'text' )
+      .data( scaleValues )
+      .enter()
+      .append( 'text' )
+      .attr( 'x', d => Math.sin( this.scaleToAngleRad( d ) ) * this.labelRadius )
+      .attr( 'y', d => -Math.cos( this.scaleToAngleRad( d ) ) * this.labelRadius )
+      .attr( 'dy', '0.35em' )  // Center the text vertically
+      .attr( "font-family", "Verdana" )
+      .attr( 'font-size', '14px' )
+      .attr( 'text-anchor', 'middle' )
+      .text( d => d );
   }
 
   // Create an array of objects representing each block
@@ -235,7 +229,7 @@ export class BlockGaugeComponent implements OnInit
     this.createBlocksForValue( value );
     this.drawBlocksFromArray();
 
-    this.textElement.text(value.toFixed(1)) ;
+    this.textElement.text( value.toFixed( 1 ) );
   }
 
   // Helper function to convert the gauge value (0-100) to an angle
@@ -243,7 +237,7 @@ export class BlockGaugeComponent implements OnInit
   {
     const scale = d3.scaleLinear()
       .domain( [ 0, 100 ] )
-      .range( [ -Math.PI / 2, Math.PI / 2 ] );  // Needle moves between -90 and 90 degrees (half-circle)
+      .range( [ this.startingAngle, this.endingAngle ] );  // Needle moves between -90 and 90 degrees (half-circle)
     return scale( value );
   }
 }
