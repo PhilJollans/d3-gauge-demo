@@ -23,22 +23,25 @@ export class BlockGaugeComponent implements OnInit
   @ViewChild( 'gauge', { static: true } ) gaugeElement!: ElementRef;
 
   // Define block size and gap size in degrees
-  private readonly blockSize: number = 3 * Math.PI / 180; // Degrees for each block
-  private readonly gapSize: number = 1 * Math.PI / 180; // Degrees for each gap
+  private readonly blockSize: number = 2.5 * Math.PI / 180;
+  private readonly gapSize: number = 1 * Math.PI / 180;
 
-  private readonly mainTickInnerRadius = 80;
-  private readonly mainTickOuterRadius = 100;
+  private readonly mainTickInnerRadius = 100;
+  private readonly mainTickOuterRadius = 110;
   private readonly labelRadius = 120;
 
-  private readonly innerArcRadius = 80 ;
-  private readonly outerArcRadius = 100 ;
+  private readonly innerArcRadius = 80;
+  private readonly outerArcRadius = 100;
 
+  private readonly innerRingRadius = 80;
+  private readonly outerRingRadius = 100;
 
   blockData: Array<blockInfo> = [];
 
   private _gaugeValue = 0;
   private svg!: d3.Selection<SVGGElement, unknown, null, undefined>;
   private arcGroup!: d3.Selection<SVGGElement, unknown, null, undefined>;
+  private textElement!: d3.Selection<SVGTextElement, unknown, null, undefined>;
 
   @Input()
   get gaugeValue (): number
@@ -75,9 +78,40 @@ export class BlockGaugeComponent implements OnInit
       .startAngle( -Math.PI / 2 )
       .endAngle( Math.PI / 2 );
 
+    const arc1 = d3.arc()
+      .innerRadius( this.innerRingRadius )
+      .outerRadius( this.innerRingRadius )
+      .startAngle( -Math.PI / 2 )
+      .endAngle( Math.PI / 2 );
+
     this.svg.append( 'path' )
-      .attr( 'd', arc as any )
-      .attr( 'fill', '#ddd' );
+      .attr( 'd', arc1 as any )
+      .attr( 'fill', 'none' ) // No fill, just stroke
+      .attr( 'stroke', 'black' ) // Stroke color for each arc
+      .attr( 'stroke-width', 2 ); // Line thickness (you can adjust this value)
+
+    const arc2 = d3.arc()
+      .innerRadius( this.outerRingRadius )
+      .outerRadius( this.outerRingRadius )
+      .startAngle( -Math.PI / 2 )
+      .endAngle( Math.PI / 2 );
+
+    this.svg.append( 'path' )
+      .attr( 'd', arc2 as any )
+      .attr( 'fill', 'none' ) // No fill, just stroke
+      .attr( 'stroke', 'black' ) // Stroke color for each arc
+      .attr( 'stroke-width', 2 ); // Line thickness (you can adjust this value)
+
+    // Append a new text element
+    this.textElement = this.svg.append('text')
+      .attr('class', 'value')
+      .attr('x', 0)  // Center horizontally
+      .attr('y', -20)  // Center vertically (adjusted for baseline)
+      .attr('text-anchor', 'middle')  // Align text horizontally
+      .attr('dominant-baseline', 'middle')  // Align text vertically
+      .attr('font-size', '36px')  // Font size (can adjust as needed)
+      .attr("font-family", "Verdana")
+      .attr('fill', '#000');
 
     this.drawScale();
 
@@ -91,7 +125,7 @@ export class BlockGaugeComponent implements OnInit
     // Bind the blockData array to the SVG elements
     this.drawBlocksFromArray();
 
-    this.updateGauge( this.gaugeValue ) ;
+    this.updateGauge( this.gaugeValue );
   }
 
   drawScale (): void
@@ -172,7 +206,7 @@ export class BlockGaugeComponent implements OnInit
       .remove();
 
     // Update the last of the existing blocks, which may be a partial block
-    arcs.filter((d, i) => i === arcs.size() - 1)
+    arcs.filter( ( d, i ) => i === arcs.size() - 1 )
       .attr( 'd', d => this.createBlockArc( d )() )
       .attr( 'fill', d => d.color );
 
@@ -200,6 +234,8 @@ export class BlockGaugeComponent implements OnInit
   {
     this.createBlocksForValue( value );
     this.drawBlocksFromArray();
+
+    this.textElement.text(value.toFixed(1)) ;
   }
 
   // Helper function to convert the gauge value (0-100) to an angle
