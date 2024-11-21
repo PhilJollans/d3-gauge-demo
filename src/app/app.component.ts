@@ -5,6 +5,7 @@ import { ArcGaugeComponent } from './arc-gauge/arc-gauge.component';
 import { FormsModule } from '@angular/forms';
 import { BlockGaugeComponent } from './block-gauge/block-gauge.component';
 import { NeedleGaugeComponent } from './needle-gauge/needle-gauge.component';
+import { GradientGaugeComponent } from "./gradient-gauge/gradient-gauge.component";
 
 @Component({
   selector: 'app-root',
@@ -16,7 +17,8 @@ import { NeedleGaugeComponent } from './needle-gauge/needle-gauge.component';
     NeedleGaugeComponent,
     ArcGaugeComponent,
     BlockGaugeComponent,
-  ],
+    GradientGaugeComponent
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
