@@ -43,7 +43,7 @@ export class GradientGaugeComponent implements OnInit
   private readonly innerRingRadius = 80;
   private readonly outerRingRadius = 100;
 
-  blockData: Array<blockInfo> = [];
+  private blockData: Array<blockInfo> = [];
 
   private _gaugeValue = 0;
   private svg!: d3.Selection<SVGGElement, unknown, null, undefined>;
@@ -115,8 +115,7 @@ export class GradientGaugeComponent implements OnInit
     this.drawScale();
 
     // Create a group for the arcs
-    this.arcGroup = this.svg.append( 'g' )
-      .attr( 'transform', 'translate(0, 0)' );
+    this.arcGroup = this.svg.append( 'g' );
 
     //this.createBlockData();
     this.createBlocksForValue( 60 );
